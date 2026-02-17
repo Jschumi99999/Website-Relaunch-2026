@@ -41,7 +41,7 @@ const Hero = () => {
   }, [currentWord, currentChar]);
 
   return (
-    <section className="relative min-h-[100svh] w-full overflow-hidden">
+    <section className="relative min-h-[100dvh] w-full overflow-hidden">
       <div
         className="absolute inset-0 bg-cover bg-center"
         style={{ backgroundImage: `url(${heroBg})` }}
