@@ -1,7 +1,45 @@
 import { motion } from "framer-motion";
+import { useState, useEffect } from "react";
 import heroBg from "@/assets/hero-bg.jpg";
 
+const words = ["CREATE.", "DESIGN.", "DEVELOP."];
+
 const Hero = () => {
+  const [displayedLines, setDisplayedLines] = useState<string[]>([]);
+  const [currentWord, setCurrentWord] = useState(0);
+  const [currentChar, setCurrentChar] = useState(0);
+  const [isComplete, setIsComplete] = useState(false);
+
+  useEffect(() => {
+    if (currentWord >= words.length) {
+      setIsComplete(true);
+      return;
+    }
+
+    const word = words[currentWord];
+
+    if (currentChar <= word.length) {
+      const timeout = setTimeout(() => {
+        setDisplayedLines((prev) => {
+          const updated = [...prev];
+          updated[currentWord] = word.slice(0, currentChar);
+          return updated;
+        });
+
+        if (currentChar === word.length) {
+          setTimeout(() => {
+            setCurrentWord((w) => w + 1);
+            setCurrentChar(0);
+          }, 200);
+        } else {
+          setCurrentChar((c) => c + 1);
+        }
+      }, 80);
+
+      return () => clearTimeout(timeout);
+    }
+  }, [currentWord, currentChar]);
+
   return (
     <section className="relative h-screen w-full overflow-hidden">
       <div
@@ -19,24 +57,22 @@ const Hero = () => {
         >
           upward Solution
         </motion.p>
-        <motion.h1
-          initial={{ opacity: 0, y: 40 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 1, delay: 0.4 }}
-          className="text-4xl md:text-6xl lg:text-8xl font-bold tracking-tight text-primary-foreground font-display"
-        >
-          CREATE.
-          <br />
-          DESIGN.
-          <br />
-          DEVELOP.
-        </motion.h1>
+        <h1 className="text-4xl md:text-6xl lg:text-8xl font-bold tracking-tight text-primary-foreground font-display min-h-[3.6em]">
+          {words.map((word, i) => (
+            <span key={word} className="block">
+              {displayedLines[i] || ""}
+              {currentWord === i && !isComplete && (
+                <span className="inline-block w-[3px] h-[0.85em] bg-primary-foreground/80 ml-1 animate-pulse align-baseline" />
+              )}
+            </span>
+          ))}
+        </h1>
       </div>
 
       <motion.div
         initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ duration: 1, delay: 1.5 }}
+        animate={isComplete ? { opacity: 1 } : {}}
+        transition={{ duration: 1, delay: 0.5 }}
         className="absolute bottom-8 left-1/2 -translate-x-1/2"
       >
         <div className="h-16 w-px bg-primary-foreground/40 animate-pulse" />
