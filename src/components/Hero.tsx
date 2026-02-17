@@ -41,21 +41,24 @@ const Hero = () => {
   }, [currentWord, currentChar]);
 
   return (
-    <section className="relative min-h-[100dvh] w-full overflow-hidden">
+    <section className="relative h-[100dvh] w-full overflow-hidden">
+      {/* Background Image */}
       <div
         className="absolute inset-0 bg-cover bg-center"
         style={{ backgroundImage: `url(${heroBg})` }}
       />
+
+      {/* Overlay */}
       <div className="absolute inset-0 bg-primary/30" />
 
+      {/* Content */}
       <div
-  className="relative z-10 flex min-h-[100svh] flex-col justify-center px-8 py-8 md:px-16 md:py-16 lg:px-24 lg:py-24"
-  style={{
-    paddingTop: "calc(env(safe-area-inset-top) + 2rem)",
-    paddingBottom: "calc(env(safe-area-inset-bottom) + 2rem)",
-  }}
->
-
+        className="relative z-10 flex h-[100dvh] flex-col justify-center px-8 md:px-16 lg:px-24"
+        style={{
+          paddingTop: "calc(env(safe-area-inset-top) + 2rem)",
+          paddingBottom: "calc(env(safe-area-inset-bottom) + 2rem)",
+        }}
+      >
         <motion.p
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -64,6 +67,7 @@ const Hero = () => {
         >
           upward Solution
         </motion.p>
+
         <h1 className="text-4xl md:text-6xl lg:text-8xl font-bold tracking-tight text-primary-foreground font-display min-h-[3.6em]">
           {words.map((word, i) => (
             <span key={word} className="block">
@@ -76,14 +80,16 @@ const Hero = () => {
         </h1>
       </div>
 
+      {/* Scroll Indicator */}
       <motion.div
-  initial={{ opacity: 0 }}
-  animate={isComplete ? { opacity: 1 } : {}}
-  transition={{ duration: 1, delay: 0.5 }}
-  className="absolute left-1/2 -translate-x-1/2"
-  style={{ bottom: "calc(env(safe-area-inset-bottom) + 2rem)" }}
->
-
+        initial={{ opacity: 0 }}
+        animate={isComplete ? { opacity: 1 } : {}}
+        transition={{ duration: 1, delay: 0.5 }}
+        className="absolute left-1/2 -translate-x-1/2"
+        style={{
+          bottom: "calc(env(safe-area-inset-bottom) + 2rem)",
+        }}
+      >
         <div className="h-16 w-px bg-primary-foreground/40 animate-pulse" />
       </motion.div>
     </section>
