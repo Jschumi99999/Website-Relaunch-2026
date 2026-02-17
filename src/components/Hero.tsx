@@ -56,13 +56,13 @@ const Hero = () => {
 
       {/* Content */}
       <div
-  className="relative z-10 flex flex-col justify-center px-8 md:px-16 lg:px-24"
+  className="relative z-10 flex h-full flex-col justify-center px-8 md:px-16 lg:px-24"
   style={{
-    height: "calc(var(--vh, 1vh) * 100)",
     paddingTop: "calc(env(safe-area-inset-top) + 2rem)",
     paddingBottom: "calc(env(safe-area-inset-bottom) + 2rem)",
   }}
 >
+
         <motion.p
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
