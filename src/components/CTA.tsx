@@ -1,6 +1,10 @@
+import { useState } from "react";
 import { motion } from "framer-motion";
+import ContactDialog from "./ContactDialog";
 
 const CTA = () => {
+  const [open, setOpen] = useState(false);
+
   return (
     <section className="py-24 md:py-32 px-8 md:px-16 lg:px-24 bg-primary text-primary-foreground">
       <div className="mx-auto max-w-4xl text-center">
@@ -19,14 +23,15 @@ const CTA = () => {
             Lass uns gemeinsam eine E-Commerce-Plattform schaffen, die deine
             Marke auf das nächste Level hebt.
           </p>
-          <a
-            href="mailto:info@upward-solution.de"
+          <button
+            onClick={() => setOpen(true)}
             className="inline-block border border-primary-foreground/40 px-10 py-4 text-sm tracking-[0.2em] uppercase font-display hover:bg-primary-foreground hover:text-primary transition-all duration-500"
           >
             Kontakt aufnehmen
-          </a>
+          </button>
         </motion.div>
       </div>
+      <ContactDialog open={open} onClose={() => setOpen(false)} />
     </section>
   );
 };
