@@ -41,14 +41,21 @@ const Hero = () => {
   }, [currentWord, currentChar]);
 
   return (
-    <section className="relative h-screen w-full overflow-hidden">
+    <section className="relative min-h-[100svh] w-full overflow-hidden">
       <div
         className="absolute inset-0 bg-cover bg-center"
         style={{ backgroundImage: `url(${heroBg})` }}
       />
       <div className="absolute inset-0 bg-primary/30" />
 
-      <div className="relative z-10 flex h-full flex-col justify-center p-8 md:p-16 lg:p-24">
+      <div
+  className="relative z-10 flex min-h-[100svh] flex-col justify-center px-8 py-8 md:px-16 md:py-16 lg:px-24 lg:py-24"
+  style={{
+    paddingTop: "calc(env(safe-area-inset-top) + 2rem)",
+    paddingBottom: "calc(env(safe-area-inset-bottom) + 2rem)",
+  }}
+>
+
         <motion.p
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -70,11 +77,13 @@ const Hero = () => {
       </div>
 
       <motion.div
-        initial={{ opacity: 0 }}
-        animate={isComplete ? { opacity: 1 } : {}}
-        transition={{ duration: 1, delay: 0.5 }}
-        className="absolute bottom-8 left-1/2 -translate-x-1/2"
-      >
+  initial={{ opacity: 0 }}
+  animate={isComplete ? { opacity: 1 } : {}}
+  transition={{ duration: 1, delay: 0.5 }}
+  className="absolute left-1/2 -translate-x-1/2"
+  style={{ bottom: "calc(env(safe-area-inset-bottom) + 2rem)" }}
+>
+
         <div className="h-16 w-px bg-primary-foreground/40 animate-pulse" />
       </motion.div>
     </section>
