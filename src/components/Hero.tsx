@@ -41,7 +41,10 @@ const Hero = () => {
   }, [currentWord, currentChar]);
 
   return (
-    <section className="relative h-[100dvh] w-full overflow-hidden">
+    <section
+  className="relative w-full overflow-hidden"
+  style={{ height: "calc(var(--vh, 1vh) * 100)" }}
+>
       {/* Background Image */}
       <div
         className="absolute inset-0 bg-cover bg-center"
@@ -53,12 +56,13 @@ const Hero = () => {
 
       {/* Content */}
       <div
-        className="relative z-10 flex h-[100dvh] flex-col justify-center px-8 md:px-16 lg:px-24"
-        style={{
-          paddingTop: "calc(env(safe-area-inset-top) + 2rem)",
-          paddingBottom: "calc(env(safe-area-inset-bottom) + 2rem)",
-        }}
-      >
+  className="relative z-10 flex flex-col justify-center px-8 md:px-16 lg:px-24"
+  style={{
+    height: "calc(var(--vh, 1vh) * 100)",
+    paddingTop: "calc(env(safe-area-inset-top) + 2rem)",
+    paddingBottom: "calc(env(safe-area-inset-bottom) + 2rem)",
+  }}
+>
         <motion.p
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
