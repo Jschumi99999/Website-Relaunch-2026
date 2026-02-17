@@ -44,8 +44,6 @@
     --sidebar-accent-foreground: 240 5.9% 10%;
     --sidebar-border: 220 13% 91%;
     --sidebar-ring: 217.2 91.2% 59.8%;
-
-    --safe-top: env(safe-area-inset-top);
   }
 
   .dark {
@@ -78,8 +76,6 @@
 
   body {
     @apply bg-background text-foreground font-body antialiased;
-    padding-top: var(--safe-top);
-    background: #282624;
   }
 
   h1, h2, h3, h4, h5, h6 {
