@@ -11,20 +11,28 @@ const queryClient = new QueryClient();
 
 const App = () => {
   useEffect(() => {
-    const setVh = () => {
-      const vh = window.innerHeight * 0.01;
-      document.documentElement.style.setProperty("--vh", `${vh}px`);
-    };
+  const setViewportHeight = () => {
+    const vh = window.visualViewport
+      ? window.visualViewport.height
+      : window.innerHeight;
 
-    setVh();
-    window.addEventListener("resize", setVh);
-    window.addEventListener("orientationchange", setVh);
+    document.documentElement.style.setProperty(
+      "--vh",
+      `${vh * 0.01}px`
+    );
+  };
 
-    return () => {
-      window.removeEventListener("resize", setVh);
-      window.removeEventListener("orientationchange", setVh);
-    };
-  }, []);
+  setViewportHeight();
+
+  window.addEventListener("resize", setViewportHeight);
+  window.visualViewport?.addEventListener("resize", setViewportHeight);
+
+  return () => {
+    window.removeEventListener("resize", setViewportHeight);
+    window.visualViewport?.removeEventListener("resize", setViewportHeight);
+  };
+}, []);
+
 
   return (
     <QueryClientProvider client={queryClient}>
