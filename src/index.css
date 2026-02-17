@@ -74,11 +74,20 @@
     @apply border-border;
   }
 
+  
+  html,
+  body,
+  #root {
+    height: 100%;
+    margin: 0;
+    padding: 0;
+  }
+
   body {
     @apply bg-background text-foreground font-body antialiased;
-    margin: 0;
-     background: #282624;
-  padding-top: 0;
+
+    
+    background: #282624;
   }
 
   h1, h2, h3, h4, h5, h6 {
