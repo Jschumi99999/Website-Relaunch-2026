@@ -1,4 +1,5 @@
-import { motion } from "framer-motion";
+import { motion, useScroll, useTransform } from "framer-motion";
+import { useRef } from "react";
 import { ShoppingBag, Megaphone, Code, Palette } from "lucide-react";
 
 const services = [
@@ -29,9 +30,26 @@ const services = [
 ];
 
 const Services = () => {
+  const sectionRef = useRef<HTMLElement>(null);
+  const { scrollYProgress } = useScroll({
+    target: sectionRef,
+    offset: ["start end", "end start"],
+  });
+
+  const bgY = useTransform(scrollYProgress, [0, 1], ["-5%", "5%"]);
+
   return (
-    <section className="py-24 md:py-32 px-8 md:px-16 lg:px-24 bg-card">
-      <div className="mx-auto max-w-7xl">
+    <section ref={sectionRef} className="relative py-24 md:py-32 px-8 md:px-16 lg:px-24 bg-card overflow-hidden">
+      {/* Parallax background gradient */}
+      <motion.div
+        className="absolute inset-0 opacity-30"
+        style={{
+          y: bgY,
+          background: "radial-gradient(ellipse at 70% 50%, hsl(25 30% 50% / 0.15) 0%, transparent 70%)",
+        }}
+      />
+
+      <div className="relative mx-auto max-w-7xl">
         <motion.div
           initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -51,13 +69,24 @@ const Services = () => {
           {services.map((service, index) => (
             <motion.div
               key={service.title}
-              initial={{ opacity: 0, y: 30 }}
-              whileInView={{ opacity: 1, y: 0 }}
+              initial={{ opacity: 0, y: 50, rotateX: 5 }}
+              whileInView={{ opacity: 1, y: 0, rotateX: 0 }}
               viewport={{ once: true, margin: "-50px" }}
-              transition={{ duration: 0.6, delay: index * 0.1 }}
-              className="group p-8 lg:p-10 border border-border rounded-sm bg-background hover:bg-secondary/50 transition-colors duration-500"
+              transition={{ duration: 0.7, delay: index * 0.12, ease: "easeOut" }}
+              whileHover={{
+                y: -8,
+                scale: 1.02,
+                transition: { duration: 0.3 },
+              }}
+              className="group p-8 lg:p-10 border border-border rounded-sm bg-background hover:bg-secondary/50 transition-colors duration-500 cursor-default"
+              style={{ perspective: 800 }}
             >
-              <service.icon className="h-8 w-8 text-accent mb-6 group-hover:scale-110 transition-transform duration-300" />
+              <motion.div
+                whileHover={{ rotateY: 10, scale: 1.2 }}
+                transition={{ duration: 0.3 }}
+              >
+                <service.icon className="h-8 w-8 text-accent mb-6 transition-transform duration-300" />
+              </motion.div>
               <h3 className="text-xl font-semibold mb-3 font-display text-foreground">
                 {service.title}
               </h3>
