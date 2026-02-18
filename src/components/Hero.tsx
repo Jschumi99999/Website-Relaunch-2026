@@ -55,17 +55,17 @@ const Hero = () => {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, delay: 0.2 }}
-          className="mb-4 text-xs sm:text-sm tracking-[0.3em] uppercase text-foreground/50 font-display"
+          className="mb-4 text-xs sm:text-sm tracking-[0.3em] uppercase text-muted-foreground/60 font-display"
         >
           upward Solution
         </motion.p>
 
-        <h1 className="text-3xl sm:text-5xl md:text-7xl lg:text-[6rem] font-bold tracking-tight text-foreground font-display leading-[1.1]">
+        <h1 className="text-3xl sm:text-5xl md:text-7xl lg:text-[6rem] font-bold tracking-tight text-primary font-display leading-[1.1]">
           {words.map((word, i) => (
             <span key={word} className="block">
               {displayedLines[i] || ""}
               {currentWord === i && !isComplete && (
-                <span className="inline-block w-[2px] sm:w-[3px] h-[0.8em] bg-foreground/60 ml-1 animate-pulse align-baseline" />
+                <span className="inline-block w-[2px] sm:w-[3px] h-[0.8em] bg-primary/50 ml-1 animate-pulse align-baseline" />
               )}
             </span>
           ))}
