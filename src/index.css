@@ -89,7 +89,7 @@
 
   body {
     @apply bg-background text-foreground font-body antialiased;
-    background: #282624;
+    background: hsl(30 10% 96%);
   }
 
   h1, h2, h3, h4, h5, h6 {

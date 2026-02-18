@@ -13,7 +13,7 @@ const Index = () => {
   const scaleX = useSpring(scrollYProgress, { stiffness: 100, damping: 30, restDelta: 0.001 });
 
   // Fade out 3D scene in the last 25% of the page (CTA area)
-  const sceneOpacity = useTransform(scrollYProgress, [0, 0.7, 0.9], [1, 1, 0]);
+  const sceneOpacity = useTransform(scrollYProgress, [0, 0.3, 0.45], [1, 1, 0]);
 
   return (
     <>
