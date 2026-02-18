@@ -11,8 +11,8 @@ const queryClient = new QueryClient();
 
 const App = () => {
   useEffect(() => {
-    // Use light mode
-    document.documentElement.classList.remove("dark");
+    // Force dark mode
+    document.documentElement.classList.add("dark");
 
     const setViewportHeight = () => {
       const vh = window.visualViewport
