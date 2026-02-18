@@ -11,27 +11,25 @@ const queryClient = new QueryClient();
 
 const App = () => {
   useEffect(() => {
-  const setViewportHeight = () => {
-    const vh = window.visualViewport
-      ? window.visualViewport.height
-      : window.innerHeight;
+    // Force dark mode
+    document.documentElement.classList.add("dark");
 
-    document.documentElement.style.setProperty(
-      "--vh",
-      `${vh * 0.01}px`
-    );
-  };
+    const setViewportHeight = () => {
+      const vh = window.visualViewport
+        ? window.visualViewport.height
+        : window.innerHeight;
+      document.documentElement.style.setProperty("--vh", `${vh * 0.01}px`);
+    };
 
-  setViewportHeight();
+    setViewportHeight();
+    window.addEventListener("resize", setViewportHeight);
+    window.visualViewport?.addEventListener("resize", setViewportHeight);
 
-  window.addEventListener("resize", setViewportHeight);
-  window.visualViewport?.addEventListener("resize", setViewportHeight);
-
-  return () => {
-    window.removeEventListener("resize", setViewportHeight);
-    window.visualViewport?.removeEventListener("resize", setViewportHeight);
-  };
-}, []);
+    return () => {
+      window.removeEventListener("resize", setViewportHeight);
+      window.visualViewport?.removeEventListener("resize", setViewportHeight);
+    };
+  }, []);
 
 
   return (

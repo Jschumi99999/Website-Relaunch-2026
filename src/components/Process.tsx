@@ -1,6 +1,5 @@
 import { motion, useScroll, useTransform } from "framer-motion";
-import { useRef, Suspense } from "react";
-import { ProcessScene } from "./HeroScene";
+import { useRef } from "react";
 
 const steps = [
   { number: "01", title: "Analyse", description: "Wir verstehen deine Marke, deine Ziele und deine Zielgruppe." },
@@ -10,55 +9,32 @@ const steps = [
 ];
 
 const Process = () => {
-  const sectionRef = useRef<HTMLElement>(null);
-  const { scrollYProgress } = useScroll({
-    target: sectionRef,
-    offset: ["start end", "end start"],
-  });
-  const progressLine = useTransform(scrollYProgress, [0.1, 0.7], ["0%", "100%"]);
+  const ref = useRef<HTMLDivElement>(null);
+  const { scrollYProgress } = useScroll({ target: ref, offset: ["start end", "end start"] });
+  const lineWidth = useTransform(scrollYProgress, [0.15, 0.7], ["0%", "100%"]);
 
   return (
-    <section ref={sectionRef} className="relative py-16 sm:py-24 md:py-32 px-6 sm:px-8 md:px-16 lg:px-24 bg-background overflow-hidden">
-      {/* 3D Background */}
-      <Suspense fallback={null}><ProcessScene /></Suspense>
-
-      <div className="relative mx-auto max-w-7xl" style={{ zIndex: 2 }}>
-        <motion.div initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, margin: "-100px" }} transition={{ duration: 0.6 }} className="mb-10 sm:mb-16">
-          <p className="text-xs sm:text-sm tracking-[0.3em] uppercase text-muted-foreground mb-4 font-display">Wie wir arbeiten</p>
+    <div ref={ref} className="relative min-h-screen py-20 sm:py-32 md:py-40 px-6 sm:px-8 md:px-16 lg:px-24 flex items-center">
+      <div className="mx-auto max-w-6xl">
+        <div className="mb-12 sm:mb-16">
+          <p className="text-xs sm:text-sm tracking-[0.3em] uppercase text-muted-foreground/60 mb-4 font-display">Wie wir arbeiten</p>
           <h2 className="text-2xl sm:text-3xl md:text-5xl font-bold tracking-tight text-foreground font-display">Unser Prozess</h2>
-        </motion.div>
-
-        {/* Progress line on desktop */}
-        <div className="hidden lg:block relative mb-4">
-          <div className="absolute top-0 left-0 w-full h-px bg-border" />
-          <motion.div className="absolute top-0 left-0 h-px bg-accent" style={{ width: progressLine }} />
         </div>
-
+        <div className="hidden lg:block relative mb-8">
+          <div className="w-full h-px bg-foreground/[0.06]" />
+          <motion.div className="absolute top-0 left-0 h-px bg-accent/30" style={{ width: lineWidth }} />
+        </div>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 sm:gap-8">
-          {steps.map((step, index) => (
-            <motion.div
-              key={step.number}
-              initial={{ opacity: 0, y: 40, scale: 0.95 }}
-              whileInView={{ opacity: 1, y: 0, scale: 1 }}
-              viewport={{ once: true, margin: "-50px" }}
-              transition={{ duration: 0.7, delay: index * 0.15, ease: [0.25, 0.46, 0.45, 0.94] }}
-              className="relative pt-6 sm:pt-8 bg-background/60 backdrop-blur-sm p-4 sm:p-6 rounded-sm"
-            >
-              <motion.span
-                className="text-5xl sm:text-7xl font-bold text-border font-display block"
-                whileInView={{ color: ["hsl(30 8% 88%)", "hsl(25 30% 50%)", "hsl(30 8% 88%)"] }}
-                viewport={{ once: true }}
-                transition={{ duration: 1.5, delay: index * 0.2 + 0.5 }}
-              >
-                {step.number}
-              </motion.span>
-              <h3 className="text-lg sm:text-xl font-semibold mt-2 mb-2 font-display text-foreground">{step.title}</h3>
-              <p className="text-sm sm:text-base text-muted-foreground leading-relaxed">{step.description}</p>
-            </motion.div>
+          {steps.map((step) => (
+            <div key={step.number} className="relative">
+              <span className="text-4xl sm:text-5xl lg:text-6xl font-bold text-foreground/[0.08] font-display block">{step.number}</span>
+              <h3 className="text-base sm:text-lg font-semibold mt-1 mb-2 font-display text-foreground">{step.title}</h3>
+              <p className="text-sm text-muted-foreground/70 leading-relaxed">{step.description}</p>
+            </div>
           ))}
         </div>
       </div>
-    </section>
+    </div>
   );
 };
 
