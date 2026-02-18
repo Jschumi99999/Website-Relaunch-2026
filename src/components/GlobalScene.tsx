@@ -1,5 +1,5 @@
 import { useRef, useMemo } from "react";
-import { Canvas, useFrame, useThree } from "@react-three/fiber";
+import { Canvas, useFrame } from "@react-three/fiber";
 import {
   MeshDistortMaterial,
   MeshTransmissionMaterial,
@@ -11,40 +11,48 @@ import * as THREE from "three";
 import { useIsMobile } from "@/hooks/use-mobile";
 
 /* ═══════════════════════════════════════════════════════════
-   HERO GLASS BLOB — Large refractive glass sphere
+   GLASS BUBBLE — Refractive transparent sphere
    ═══════════════════════════════════════════════════════════ */
-const GlassBlob = ({ isMobile }: { isMobile: boolean }) => {
+const GlassBubble = ({
+  position,
+  scale = 1,
+  speed = 0.3,
+  isMobile = false,
+  color = "#e8d8c8",
+}: {
+  position: [number, number, number];
+  scale?: number;
+  speed?: number;
+  isMobile?: boolean;
+  color?: string;
+}) => {
   const ref = useRef<THREE.Mesh>(null);
 
   useFrame((state) => {
     if (!ref.current) return;
     const t = state.clock.elapsedTime;
-    ref.current.rotation.x = t * 0.08;
-    ref.current.rotation.y = t * 0.12;
-    ref.current.position.y = 1 + Math.sin(t * 0.4) * 0.3;
+    ref.current.rotation.x = t * speed * 0.3;
+    ref.current.rotation.y = t * speed * 0.5;
+    ref.current.position.y = position[1] + Math.sin(t * speed + position[0]) * 0.4;
+    ref.current.position.x = position[0] + Math.sin(t * speed * 0.7 + position[2]) * 0.15;
   });
 
   return (
-    <Float speed={1.5} rotationIntensity={0.4} floatIntensity={1}>
-      <mesh
-        ref={ref}
-        position={[isMobile ? 1.5 : 3.5, 1, 0]}
-        scale={isMobile ? 1.6 : 2.8}
-        castShadow
-      >
-        <icosahedronGeometry args={[1, isMobile ? 6 : 12]} />
+    <Float speed={speed * 3} rotationIntensity={0.3} floatIntensity={0.8}>
+      <mesh ref={ref} position={position} scale={scale} castShadow>
+        <sphereGeometry args={[1, isMobile ? 24 : 48, isMobile ? 24 : 48]} />
         <MeshTransmissionMaterial
           backside
-          samples={isMobile ? 4 : 8}
-          thickness={0.4}
-          chromaticAberration={0.3}
-          anisotropy={0.5}
-          distortion={0.6}
-          distortionScale={0.4}
-          temporalDistortion={0.2}
-          roughness={0.05}
+          samples={isMobile ? 3 : 6}
+          thickness={0.35}
+          chromaticAberration={0.25}
+          anisotropy={0.4}
+          distortion={0.5}
+          distortionScale={0.3}
+          temporalDistortion={0.15}
+          roughness={0.02}
           ior={1.5}
-          color="#e8d8c8"
+          color={color}
           transmission={0.95}
         />
       </mesh>
@@ -53,14 +61,14 @@ const GlassBlob = ({ isMobile }: { isMobile: boolean }) => {
 };
 
 /* ═══════════════════════════════════════════════════════════
-   MORPHING METALLIC SPHERE — Liquid metal effect
+   METALLIC BUBBLE — Morphing reflective sphere
    ═══════════════════════════════════════════════════════════ */
-const LiquidMetal = ({
+const MetallicBubble = ({
   position,
   scale = 1,
-  color = "#8a7a6a",
-  distort = 0.5,
-  speed = 3,
+  color = "#9a8a7a",
+  distort = 0.4,
+  speed = 2.5,
 }: {
   position: [number, number, number];
   scale?: number;
@@ -73,20 +81,20 @@ const LiquidMetal = ({
   useFrame((state) => {
     if (!ref.current) return;
     const t = state.clock.elapsedTime;
-    ref.current.rotation.y = t * 0.06;
-    ref.current.rotation.z = Math.sin(t * 0.3) * 0.15;
-    ref.current.position.y = position[1] + Math.sin(t * 0.5) * 0.4;
-    ref.current.position.x = position[0] + Math.sin(t * 0.3) * 0.2;
+    ref.current.rotation.y = t * 0.08;
+    ref.current.rotation.z = Math.sin(t * 0.25) * 0.12;
+    ref.current.position.y = position[1] + Math.sin(t * 0.4 + position[0]) * 0.35;
+    ref.current.position.x = position[0] + Math.cos(t * 0.3 + position[2]) * 0.2;
   });
 
   return (
-    <Float speed={0.8} rotationIntensity={0.2} floatIntensity={0.5}>
+    <Float speed={1} rotationIntensity={0.2} floatIntensity={0.6}>
       <mesh ref={ref} position={position} scale={scale} castShadow>
         <sphereGeometry args={[1, 64, 64]} />
         <MeshDistortMaterial
           color={color}
-          envMapIntensity={1.2}
-          roughness={0.05}
+          envMapIntensity={1.4}
+          roughness={0.03}
           metalness={1}
           distort={distort}
           speed={speed}
@@ -97,139 +105,99 @@ const LiquidMetal = ({
 };
 
 /* ═══════════════════════════════════════════════════════════
-   ROTATING TORUS — Big dramatic ring with reflections
+   SOFT GLOW BUBBLE — Emissive ambient sphere
    ═══════════════════════════════════════════════════════════ */
-const DramaticTorus = ({
+const GlowBubble = ({
   position,
   scale = 1,
-  speed = 0.04,
-  tubeRadius = 0.06,
-  color = "#b0a090",
+  color = "#c4956a",
+  speed = 0.5,
 }: {
   position: [number, number, number];
   scale?: number;
-  speed?: number;
-  tubeRadius?: number;
   color?: string;
+  speed?: number;
 }) => {
   const ref = useRef<THREE.Mesh>(null);
 
   useFrame((state) => {
     if (!ref.current) return;
     const t = state.clock.elapsedTime;
-    ref.current.rotation.x = t * speed;
-    ref.current.rotation.y = t * speed * 0.7;
-    ref.current.rotation.z = Math.sin(t * speed * 2) * 0.3;
+    ref.current.position.y = position[1] + Math.sin(t * speed + position[0] * 2) * 0.5;
+    ref.current.position.x = position[0] + Math.cos(t * speed * 0.6 + position[2]) * 0.3;
+    const pulse = 0.85 + Math.sin(t * speed * 1.5) * 0.15;
+    ref.current.scale.setScalar(scale * pulse);
   });
 
   return (
-    <mesh ref={ref} position={position} scale={scale} castShadow>
-      <torusGeometry args={[1, tubeRadius, 48, 128]} />
+    <mesh ref={ref} position={position} scale={scale}>
+      <sphereGeometry args={[1, 32, 32]} />
       <meshStandardMaterial
         color={color}
-        roughness={0.1}
-        metalness={0.95}
-        envMapIntensity={1.5}
+        emissive={color}
+        emissiveIntensity={0.15}
+        roughness={0.15}
+        metalness={0.85}
+        envMapIntensity={1.2}
+        transparent
+        opacity={0.85}
       />
     </mesh>
   );
 };
 
 /* ═══════════════════════════════════════════════════════════
-   GLASS TORUS — Second ring with transmission
+   TINY FLOATING BUBBLES — Small ambient particles
    ═══════════════════════════════════════════════════════════ */
-const GlassTorus = ({
-  position,
-  scale = 1,
-  speed = 0.03,
+const TinyBubbles = ({
+  count = 15,
+  spread = 12,
   isMobile = false,
 }: {
-  position: [number, number, number];
-  scale?: number;
-  speed?: number;
-  isMobile?: boolean;
-}) => {
-  const ref = useRef<THREE.Mesh>(null);
-
-  useFrame((state) => {
-    if (!ref.current) return;
-    const t = state.clock.elapsedTime;
-    ref.current.rotation.x = t * speed + Math.PI * 0.25;
-    ref.current.rotation.z = t * speed * 0.5;
-  });
-
-  return (
-    <mesh ref={ref} position={position} scale={scale} castShadow>
-      <torusGeometry args={[1, 0.04, 32, 100]} />
-      <MeshTransmissionMaterial
-        backside
-        samples={isMobile ? 2 : 6}
-        thickness={0.3}
-        chromaticAberration={0.15}
-        roughness={0.02}
-        transmission={0.9}
-        ior={1.4}
-        color="#d0c8c0"
-      />
-    </mesh>
-  );
-};
-
-/* ═══════════════════════════════════════════════════════════
-   ORBITING SMALL SPHERES — Satellites around main blob
-   ═══════════════════════════════════════════════════════════ */
-const OrbitingSpheres = ({
-  center,
-  count = 5,
-  radius = 3,
-  isMobile = false,
-}: {
-  center: [number, number, number];
   count?: number;
-  radius?: number;
+  spread?: number;
   isMobile?: boolean;
 }) => {
   const groupRef = useRef<THREE.Group>(null);
-  const actualCount = isMobile ? 3 : count;
+  const actualCount = isMobile ? Math.floor(count * 0.5) : count;
 
-  const spheres = useMemo(
+  const bubbles = useMemo(
     () =>
       Array.from({ length: actualCount }, (_, i) => ({
-        phase: (i / actualCount) * Math.PI * 2,
-        speed: 0.2 + Math.random() * 0.15,
-        size: 0.06 + Math.random() * 0.1,
-        yOff: (Math.random() - 0.5) * 2,
-        orbitRadius: radius * (0.8 + Math.random() * 0.4),
+        pos: [
+          (Math.random() - 0.5) * spread,
+          (Math.random() - 0.5) * spread * 0.8,
+          (Math.random() - 0.5) * spread * 0.5 - 2,
+        ] as [number, number, number],
+        size: 0.04 + Math.random() * 0.08,
+        speed: 0.2 + Math.random() * 0.4,
+        phase: Math.random() * Math.PI * 2,
       })),
-    [actualCount, radius]
+    [actualCount, spread]
   );
 
   useFrame((state) => {
     if (!groupRef.current) return;
     const t = state.clock.elapsedTime;
     groupRef.current.children.forEach((child, i) => {
-      const s = spheres[i];
-      if (!s) return;
-      const angle = t * s.speed + s.phase;
-      child.position.set(
-        center[0] + Math.cos(angle) * s.orbitRadius,
-        center[1] + s.yOff + Math.sin(t * 0.5 + s.phase) * 0.3,
-        center[2] + Math.sin(angle) * s.orbitRadius
-      );
+      const b = bubbles[i];
+      if (!b) return;
+      child.position.y = b.pos[1] + Math.sin(t * b.speed + b.phase) * 0.6;
+      child.position.x = b.pos[0] + Math.cos(t * b.speed * 0.7 + b.phase) * 0.3;
     });
   });
 
   return (
     <group ref={groupRef}>
-      {spheres.map((s, i) => (
-        <mesh key={i} scale={s.size} castShadow>
-          <sphereGeometry args={[1, 24, 24]} />
+      {bubbles.map((b, i) => (
+        <mesh key={i} position={b.pos} scale={b.size} castShadow>
+          <sphereGeometry args={[1, 16, 16]} />
           <meshStandardMaterial
             color="#e0d0c0"
             roughness={0.1}
             metalness={0.9}
             emissive="#c0a080"
-            emissiveIntensity={0.3}
+            emissiveIntensity={0.2}
             envMapIntensity={1.5}
           />
         </mesh>
@@ -239,132 +207,79 @@ const OrbitingSpheres = ({
 };
 
 /* ═══════════════════════════════════════════════════════════
-   FLOATING DIAMOND — Rotating gem shape
-   ═══════════════════════════════════════════════════════════ */
-const FloatingDiamond = ({
-  position,
-  scale = 1,
-  speed = 0.06,
-}: {
-  position: [number, number, number];
-  scale?: number;
-  speed?: number;
-}) => {
-  const ref = useRef<THREE.Mesh>(null);
-
-  useFrame((state) => {
-    if (!ref.current) return;
-    const t = state.clock.elapsedTime;
-    ref.current.rotation.y = t * speed;
-    ref.current.rotation.x = Math.sin(t * 0.4) * 0.2;
-    ref.current.position.y = position[1] + Math.sin(t * 0.6) * 0.3;
-  });
-
-  return (
-    <Float speed={1} rotationIntensity={0.3} floatIntensity={0.4}>
-      <mesh ref={ref} position={position} scale={scale} castShadow>
-        <octahedronGeometry args={[1, 0]} />
-        <meshStandardMaterial
-          color="#c0b0a0"
-          roughness={0.05}
-          metalness={0.95}
-          envMapIntensity={2}
-        />
-      </mesh>
-    </Float>
-  );
-};
-
-/* ═══════════════════════════════════════════════════════════
-   SCENE WITH SCROLL + MOUSE PARALLAX
+   SCROLL SCENE — Bubbles with scroll + mouse parallax
    ═══════════════════════════════════════════════════════════ */
 const ScrollScene = ({ isMobile }: { isMobile: boolean }) => {
   const group = useRef<THREE.Group>(null);
-  const mouse = useRef({ x: 0, y: 0 });
   const smoothMouse = useRef({ x: 0, y: 0 });
 
   useFrame(() => {
     if (!group.current) return;
 
-    // Scroll parallax
     const scrollY = window.scrollY || 0;
     const maxScroll = document.documentElement.scrollHeight - window.innerHeight;
     const progress = maxScroll > 0 ? scrollY / maxScroll : 0;
-    group.current.position.y = progress * 8;
+    group.current.position.y = progress * 6;
 
-    // Smooth mouse parallax (desktop only)
     if (!isMobile) {
       const targetX = ((window as any).__mouseX ?? 0.5) - 0.5;
       const targetY = ((window as any).__mouseY ?? 0.5) - 0.5;
       smoothMouse.current.x += (targetX - smoothMouse.current.x) * 0.03;
       smoothMouse.current.y += (targetY - smoothMouse.current.y) * 0.03;
-      group.current.rotation.y = progress * 0.25 + smoothMouse.current.x * 0.15;
-      group.current.rotation.x = smoothMouse.current.y * 0.08;
+      group.current.rotation.y = progress * 0.2 + smoothMouse.current.x * 0.12;
+      group.current.rotation.x = smoothMouse.current.y * 0.06;
     } else {
-      group.current.rotation.y = progress * 0.2;
+      group.current.rotation.y = progress * 0.15;
     }
   });
 
   return (
     <group ref={group}>
-      {/* ── Main glass blob — hero centerpiece ── */}
-      <GlassBlob isMobile={isMobile} />
-
-      {/* ── Orbiting satellites around the blob ── */}
-      <OrbitingSpheres
-        center={[isMobile ? 1.5 : 3.5, 1, 0]}
-        count={isMobile ? 3 : 6}
-        radius={isMobile ? 2.5 : 4}
+      {/* ── Hero: Large glass bubble ── */}
+      <GlassBubble
+        position={[isMobile ? 1.8 : 3.5, 1, 0]}
+        scale={isMobile ? 1.8 : 2.8}
+        speed={0.3}
         isMobile={isMobile}
+        color="#e8d8c8"
       />
 
-      {/* ── Liquid metal sphere ── */}
-      <LiquidMetal
-        position={[isMobile ? -1.5 : -3.5, -3.5, -1]}
-        scale={isMobile ? 1 : 1.8}
-        color="#9a8a7a"
-        distort={0.5}
-        speed={3}
+      {/* ── Hero: Medium metallic bubble ── */}
+      <MetallicBubble
+        position={[isMobile ? -1.2 : -2.8, 0.5, -1]}
+        scale={isMobile ? 1 : 1.6}
+        color="#a09080"
+        distort={0.45}
+        speed={2.5}
       />
 
-      {/* ── Dramatic torus rings ── */}
-      <DramaticTorus
-        position={[isMobile ? -0.5 : -2, 0, -3]}
-        scale={isMobile ? 2 : 4}
-        speed={0.035}
-        tubeRadius={0.05}
-        color="#b8a898"
-      />
-      <GlassTorus
-        position={[isMobile ? 1 : 2.5, -2.5, -2]}
-        scale={isMobile ? 1.5 : 3}
-        speed={0.025}
-        isMobile={isMobile}
-      />
-      {!isMobile && (
-        <DramaticTorus
-          position={[-1, -6, -4]}
-          scale={3.5}
-          speed={0.02}
-          tubeRadius={0.04}
-          color="#a09888"
-        />
-      )}
-
-      {/* ── Floating diamond ── */}
-      <FloatingDiamond
-        position={[isMobile ? 2 : 5, -1.5, -2]}
+      {/* ── Hero: Small glass accent ── */}
+      <GlassBubble
+        position={[isMobile ? -0.8 : -1.2, 2.2, -2]}
         scale={isMobile ? 0.5 : 0.8}
-        speed={0.05}
+        speed={0.5}
+        isMobile={isMobile}
+        color="#d0c8c0"
       />
+
+      {/* ── Scattered glow bubbles ── */}
+      <GlowBubble position={[isMobile ? 2.2 : 4.5, -1.5, -2]} scale={isMobile ? 0.4 : 0.7} color="#c4956a" speed={0.4} />
+      <GlowBubble position={[isMobile ? -1.8 : -4, -3, -1.5]} scale={isMobile ? 0.5 : 0.9} color="#8a7a6a" speed={0.35} />
       {!isMobile && (
-        <FloatingDiamond position={[-4, -4.5, -1.5]} scale={0.6} speed={0.04} />
+        <>
+          <GlowBubble position={[1, -5, -3]} scale={0.5} color="#b0a090" speed={0.45} />
+          <GlassBubble position={[-3, -2, -3]} scale={0.6} speed={0.4} color="#d8c8b8" />
+          <MetallicBubble position={[4, -4, -2]} scale={0.7} color="#9a8a7a" distort={0.35} speed={2} />
+        </>
       )}
 
-      {/* ── Contact shadows on ground plane ── */}
+      {/* ── Tiny ambient bubbles ── */}
+      <TinyBubbles count={20} spread={14} isMobile={isMobile} />
+
+      {/* ── Contact shadows ── */}
       <ContactShadows
         position={[0, -4, 0]}
-        opacity={0.3}
+        opacity={0.25}
         scale={20}
         blur={2.5}
         far={8}
@@ -375,27 +290,19 @@ const ScrollScene = ({ isMobile }: { isMobile: boolean }) => {
 };
 
 /* ═══════════════════════════════════════════════════════════
-   MOUSE TRACKER — captures mouse for parallax
+   MOUSE TRACKER
    ═══════════════════════════════════════════════════════════ */
 const MouseTracker = () => {
-  const { gl } = useThree();
-
   useFrame(() => {
-    const handler = (e: MouseEvent) => {
-      (window as any).__mouseX = e.clientX / window.innerWidth;
-      (window as any).__mouseY = e.clientY / window.innerHeight;
-    };
-
     if (!(window as any).__mouseTrackerAdded) {
+      const handler = (e: MouseEvent) => {
+        (window as any).__mouseX = e.clientX / window.innerWidth;
+        (window as any).__mouseY = e.clientY / window.innerHeight;
+      };
       window.addEventListener("mousemove", handler);
       (window as any).__mouseTrackerAdded = true;
-      (window as any).__mouseCleanup = () => {
-        window.removeEventListener("mousemove", handler);
-        (window as any).__mouseTrackerAdded = false;
-      };
     }
   });
-
   return null;
 };
 
@@ -420,30 +327,28 @@ const GlobalScene = () => {
         }}
         style={{ background: "transparent" }}
       >
-        {/* Rich lighting setup for reflections */}
-        <ambientLight intensity={0.2} />
+        <ambientLight intensity={0.25} />
         <directionalLight
           position={[6, 8, 5]}
-          intensity={1.2}
+          intensity={1.1}
           color="#fff0e0"
           castShadow
           shadow-mapSize={[1024, 1024]}
           shadow-bias={-0.001}
         />
-        <directionalLight position={[-4, -3, 4]} intensity={0.4} color="#e0e8ff" />
-        <pointLight position={[0, 5, 3]} intensity={0.6} color="#ffe0c0" />
-        <pointLight position={[-3, -2, 2]} intensity={0.3} color="#c0d0e0" />
+        <directionalLight position={[-4, -3, 4]} intensity={0.35} color="#e0e8ff" />
+        <pointLight position={[0, 5, 3]} intensity={0.5} color="#ffe0c0" />
+        <pointLight position={[-3, -2, 2]} intensity={0.25} color="#c0d0e0" />
         <spotLight
           position={[4, 6, 4]}
           angle={0.4}
           penumbra={0.8}
-          intensity={0.8}
+          intensity={0.7}
           color="#f0e0d0"
           castShadow
         />
 
-        {/* HDRI environment for realistic reflections */}
-        <Environment preset="city" environmentIntensity={0.4} />
+        <Environment preset="city" environmentIntensity={0.5} />
 
         <MouseTracker />
         <ScrollScene isMobile={isMobile} />
