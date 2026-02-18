@@ -1,6 +1,6 @@
-import { motion } from "framer-motion";
-import { useState, useEffect } from "react";
-import heroBg from "@/assets/hero-bg.jpg";
+import { motion, useScroll, useTransform } from "framer-motion";
+import { useState, useEffect, useRef, Suspense } from "react";
+import HeroScene from "./HeroScene";
 
 const words = ["CREATE.", "DESIGN.", "DEVELOP."];
 
@@ -9,6 +9,17 @@ const Hero = () => {
   const [currentWord, setCurrentWord] = useState(0);
   const [currentChar, setCurrentChar] = useState(0);
   const [isComplete, setIsComplete] = useState(false);
+  const sectionRef = useRef<HTMLElement>(null);
+
+  const { scrollYProgress } = useScroll({
+    target: sectionRef,
+    offset: ["start start", "end start"],
+  });
+
+  const textY = useTransform(scrollYProgress, [0, 1], [0, -150]);
+  const textOpacity = useTransform(scrollYProgress, [0, 0.6], [1, 0]);
+  const sceneScale = useTransform(scrollYProgress, [0, 1], [1, 1.3]);
+  const sceneOpacity = useTransform(scrollYProgress, [0, 0.8], [1, 0.2]);
 
   useEffect(() => {
     if (currentWord >= words.length) {
@@ -42,27 +53,31 @@ const Hero = () => {
 
   return (
     <section
-  className="relative w-full overflow-hidden"
-  style={{ height: "calc(var(--vh, 1vh) * 100)" }}
->
-      {/* Background Image */}
-      <div
-        className="absolute inset-0 bg-cover bg-center"
-        style={{ backgroundImage: `url(${heroBg})` }}
-      />
+      ref={sectionRef}
+      className="relative w-full overflow-hidden"
+      style={{ height: "calc(var(--vh, 1vh) * 100)" }}
+    >
+      {/* 3D Scene Background */}
+      <motion.div className="absolute inset-0" style={{ scale: sceneScale, opacity: sceneOpacity }}>
+        <div className="absolute inset-0 bg-[#282624]" />
+        <Suspense fallback={null}>
+          <HeroScene />
+        </Suspense>
+      </motion.div>
 
-      {/* Overlay */}
-      <div className="absolute inset-0 bg-primary/30" />
+      {/* Gradient overlay for depth */}
+      <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-[#282624]/80" style={{ zIndex: 2 }} />
 
       {/* Content */}
-      <div
-  className="relative z-10 flex h-full flex-col justify-center px-8 md:px-16 lg:px-24"
-  style={{
-    paddingTop: "calc(env(safe-area-inset-top) + 2rem)",
-    paddingBottom: "calc(env(safe-area-inset-bottom) + 2rem)",
-  }}
->
-
+      <motion.div
+        className="relative z-10 flex h-full flex-col justify-center px-8 md:px-16 lg:px-24"
+        style={{
+          y: textY,
+          opacity: textOpacity,
+          paddingTop: "calc(env(safe-area-inset-top) + 2rem)",
+          paddingBottom: "calc(env(safe-area-inset-bottom) + 2rem)",
+        }}
+      >
         <motion.p
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -82,7 +97,7 @@ const Hero = () => {
             </span>
           ))}
         </h1>
-      </div>
+      </motion.div>
 
       {/* Scroll Indicator */}
       <motion.div
@@ -92,9 +107,14 @@ const Hero = () => {
         className="absolute left-1/2 -translate-x-1/2"
         style={{
           bottom: "calc(env(safe-area-inset-bottom) + 2rem)",
+          zIndex: 10,
         }}
       >
-        <div className="h-16 w-px bg-primary-foreground/40 animate-pulse" />
+        <motion.div
+          animate={{ y: [0, 8, 0] }}
+          transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
+          className="h-16 w-px bg-primary-foreground/40"
+        />
       </motion.div>
     </section>
   );
